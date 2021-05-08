@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'kr.entree.spigradle' version '2.2.3'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+def version = '1.16.5'
+spigot.debug.buildVersion = version
+
+task testDownload {
+    doLast {
+        println("Java version: ${JavaVersion.current()}")
+        println("Gradle version: ${gradle.gradleVersion}")
+        def url = new URL("https://papermc.io/api/v1/paper/${version}/latest/download")
+        def file = new File(temporaryDir, 'paper.jar')
+        file.bytes = url.bytes
+        println("Downloaded! size: ${file.size()}")
+    }
+    finalizedBy(downloadPaper)
+}
+downloadPaper.outputs.upToDateWhen { false }
+downloadPaper.onlyIf { true }
+downloadPaper.doLast {
+    def file = downloadPaper.destination.get()
+    println("Paper size: ${file.size()}")
+}
